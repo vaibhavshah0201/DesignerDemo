@@ -4,10 +4,9 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
 } from 'react-native-reanimated';
-import {TextInput} from 'react-native';
+import {Image} from 'react-native';
 import {Circle, Svg} from 'react-native-svg';
 
-const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 export const AnimatedImage = (props: any) => {
   const offset = useSharedValue({
     x: 0,
@@ -29,12 +28,16 @@ export const AnimatedImage = (props: any) => {
   const savedScale = useSharedValue(1);
   const rotation = useSharedValue(0);
   const savedRotation = useSharedValue(0);
+  const borderWidth = useSharedValue(0);
   // const globleScale = props.canvasSize && props.canvasSize.globleScale;
+
   const animatedStyles = useAnimatedStyle((): any => {
     return {
       height: 100,
       width: 100,
-
+      borderWidth: (props.isSelected) ? 1 : 0,
+      borderColor: 'black',
+      borderStyle: 'dashed',
       transform: [
         {translateX: !isNaN(offset.value.x) ? offset.value.x : 0},
         {translateY: !isNaN(offset.value.y) ? offset.value.y : 0},
@@ -65,7 +68,6 @@ export const AnimatedImage = (props: any) => {
     })
     .onEnd(event => {
       savedScale.value = scale.value;
-
       scaleXPosition.value =
         event.focalX - (event.focalX - position.value.x) * (1 - event.scale);
       scaleYPosition.value =
@@ -80,21 +82,31 @@ export const AnimatedImage = (props: any) => {
       savedRotation.value = rotation.value;
     });
 
+  const tapStart = Gesture.Tap().onStart(() => {
+    props.handleImagePress;
+  });
+
   const composed = Gesture.Simultaneous(
-    dragGesture,
     Gesture.Simultaneous(zoomGesture, rotateGesture),
+    dragGesture,
+    tapStart,
   );
+
+  const gestureComposed = (props.isSelected) ? composed : tapStart;
+
   return (
-    <GestureDetector gesture={composed}>
-      <Animated.Image
+    <GestureDetector gesture={gestureComposed}>
+      <Animated.View
         style={[
           animatedStyles,
-          {borderColor: 'black', borderWidth: 2, borderStartWidth: 1},
         ]}
+        >
+        <Image style={{width: "100%",height:"100%"}}
         source={{
           uri: props.path,
-        }}
-      />
+        }}/>
+      </Animated.View>
+      
 
       {/* <AnimatedTextInput style={animatedStyles}/> */}
       {/* <Animated.Text style={animatedStyles}>TEst</Animated.Text> */}

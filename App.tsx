@@ -23,6 +23,7 @@ const App = () => {
     {
       id: 1,
       tool: 'image',
+      isSelected:true,
       source:
         'https://images.pexels.com/photos/734353/pexels-photo-734353.jpeg',
     },
@@ -37,6 +38,7 @@ const App = () => {
     const newDataItem = {
       id: data.length + 1,
       tool: 'image',
+      isSelected:false,
       source: 'https://source.unsplash.com/random/1024x768', // Replace with your new image URL
     };
     setData([...data, newDataItem]);
@@ -47,6 +49,7 @@ const App = () => {
       id: data.length + 1,
       tool: 'shape',
       type: 'circle',
+      isSelected:false,
       source: '', // Replace with your new image URL
     };
     setData([...data, newDataItem]);
@@ -57,6 +60,7 @@ const App = () => {
       id: data.length + 1,
       tool: 'shape',
       type: 'rectangle',
+      isSelected:false,
       source: '', // Replace with your new image URL
     };
     setData([...data, newDataItem]);
@@ -84,17 +88,17 @@ const App = () => {
           source={{
             uri: 'https://m.gotprint.com/pogAppAdmin/files/view/businesscard_2x3_5in_editor.png?productId=1&sizeId=101',
           }}
+          resizeMode='contain'
           style={[styles.canvasStyle, {backgroundColor: bgColor}]}>
           <GestureHandlerRootView style={{width: '100%', height: '100%'}}>
             {data.map((image: any, index: any) => {
               if (image.tool == 'image')
                 return (
                   <Pressable
-                    onPress={() => handleImagePress(image.id)}
-                    // pointerEvents={selectedImage == image.id ? 'auto' : 'box-only'}
-                    // style={{zIndex: selectedImage == image.id ? 1 : 0}}
-                    key={index}>
-                    <AnimatedImage path={image.source} />
+                    onPress={() => handleImagePress(image.id)}                   
+                    key={index}
+                    >
+                    <AnimatedImage imageId={image.id} handleImagePress={handleImagePress} path={image.source} isSelected={(image.id == selectedImage) ? true : false}/>
                   </Pressable>
                 );
 
@@ -158,6 +162,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     height: 652.7500162173914 / PixelRatio.get(),
-    width: 1119 / PixelRatio.get(),
+    width: 1162 / PixelRatio.get(),
   },
 });
