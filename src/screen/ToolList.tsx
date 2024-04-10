@@ -5,18 +5,25 @@ export const ToolList = (props: any) => {
     <View
       style={[
         styles.toolBoxContainer,
-        {display: !props.showModal && !props.showShapes ? 'flex' : 'none'},
+        {
+          display:
+            !props.showModal && !props.showShapes && !props.showTextTools
+              ? 'flex'
+              : 'none',
+        },
       ]}>
-      <Pressable style={styles.toolContainer}>
+      <Pressable
+        style={styles.toolContainer}
+        onPress={() => props.setShowTextTools(true)}>
         <Image
           style={styles.toolImage}
-          source={require('/Users/vaibhav/Desktop/Development/Designer/DesignerDemo/assets/icons/add_text.png')}
+          source={require('../../assets/icons/add_text.png')}
         />
       </Pressable>
       <Pressable style={styles.toolContainer} onPress={props.addImageToData}>
         <Image
           style={styles.toolImage}
-          source={require('/Users/vaibhav/Desktop/Development/Designer/DesignerDemo/assets/icons/add_image.png')}
+          source={require('../../assets/icons/add_image.png')}
         />
       </Pressable>
       <Pressable
@@ -24,7 +31,7 @@ export const ToolList = (props: any) => {
         onPress={() => props.setShowShapes(true)}>
         <Image
           style={[styles.toolImage, {width: '100%', resizeMode: 'stretch'}]}
-          source={require('/Users/vaibhav/Desktop/Development/Designer/DesignerDemo/assets/icons/add_shapes.png')}
+          source={require('../../assets/icons/add_shapes.png')}
         />
       </Pressable>
       <Pressable
@@ -32,7 +39,7 @@ export const ToolList = (props: any) => {
         onPress={() => props.setShowModal(true)}>
         <Image
           style={styles.toolImage}
-          source={require('/Users/vaibhav/Desktop/Development/Designer/DesignerDemo/assets/icons/add_background.png')}
+          source={require('../../assets/icons/add_background.png')}
         />
       </Pressable>
     </View>
