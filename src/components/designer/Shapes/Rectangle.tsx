@@ -1,10 +1,10 @@
 import {useState} from 'react';
+import { PixelRatio, View } from 'react-native';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
 } from 'react-native-reanimated';
-import {Rect, Svg} from 'react-native-svg';
 
 export const RectangleShape = (props: any) => {
   const offset = useSharedValue({
@@ -27,12 +27,17 @@ export const RectangleShape = (props: any) => {
   const savedScale = useSharedValue(1);
   const rotation = useSharedValue(0);
   const savedRotation = useSharedValue(0);
+  const borderWidth = useSharedValue(0);
   // const globleScale = props.canvasSize && props.canvasSize.globleScale;
+
   const animatedStyles = useAnimatedStyle((): any => {
     return {
       height: 100,
-      width: 100,
-
+      width: 200,
+      borderWidth: (props.isSelected) ? 1 : 0,
+      borderColor: 'black',
+      borderStyle: 'dashed',
+      position:"absolute",
       transform: [
         {translateX: !isNaN(offset.value.x) ? offset.value.x : 0},
         {translateY: !isNaN(offset.value.y) ? offset.value.y : 0},
@@ -63,7 +68,6 @@ export const RectangleShape = (props: any) => {
     })
     .onEnd(event => {
       savedScale.value = scale.value;
-
       scaleXPosition.value =
         event.focalX - (event.focalX - position.value.x) * (1 - event.scale);
       scaleYPosition.value =
@@ -78,24 +82,26 @@ export const RectangleShape = (props: any) => {
       savedRotation.value = rotation.value;
     });
 
+  const tapStart = Gesture.Tap().onStart(() => {
+    props.handleImagePress;
+  });
+
   const composed = Gesture.Simultaneous(
-    dragGesture,
     Gesture.Simultaneous(zoomGesture, rotateGesture),
+    dragGesture,
+    tapStart,
   );
+
+  const gestureComposed = (props.isSelected) ? composed : tapStart;
+
   return (
-    <GestureDetector gesture={composed}>
-      <Animated.View style={animatedStyles}>
-        <Svg width="330" height="200">
-          <Rect
-            x="50%"
-            y="30%"
-            width="50%"
-            height="40%"
-            fill="white"
-            stroke="black"
-            strokeWidth="1"
-          />
-        </Svg>
+    <GestureDetector gesture={gestureComposed}>
+      <Animated.View
+        style={[
+          animatedStyles,
+        ]}
+        >
+          <View style={{width:"100%",height:"100%",borderColor:'black',borderWidth:1,backgroundColor:"lightgray"}} />
       </Animated.View>
     </GestureDetector>
   );

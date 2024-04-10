@@ -5,7 +5,6 @@ import Animated, {
   useSharedValue,
 } from 'react-native-reanimated';
 import {Image} from 'react-native';
-import {Circle, Svg} from 'react-native-svg';
 
 export const AnimatedImage = (props: any) => {
   const offset = useSharedValue({
@@ -38,10 +37,13 @@ export const AnimatedImage = (props: any) => {
       borderWidth: (props.isSelected) ? 1 : 0,
       borderColor: 'black',
       borderStyle: 'dashed',
+      position:"absolute",
       transform: [
         {translateX: !isNaN(offset.value.x) ? offset.value.x : 0},
         {translateY: !isNaN(offset.value.y) ? offset.value.y : 0},
         {scale: scale.value},
+        {scaleX: props.isFlipHorizontally ? -1 : 1 },
+        {scaleY: props.isFlipVertically ? -1 : 1 },
         {rotateZ: `${rotation.value}rad`},
       ],
     };
@@ -106,10 +108,6 @@ export const AnimatedImage = (props: any) => {
           uri: props.path,
         }}/>
       </Animated.View>
-      
-
-      {/* <AnimatedTextInput style={animatedStyles}/> */}
-      {/* <Animated.Text style={animatedStyles}>TEst</Animated.Text> */}
     </GestureDetector>
   );
 };
