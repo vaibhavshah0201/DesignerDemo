@@ -36,12 +36,8 @@ export const AnimatedTextInput = (props: any) => {
   const savedScale = useSharedValue(1);
   const rotation = useSharedValue(0);
   const savedRotation = useSharedValue(0);
-  // const globleScale = props.canvasSize && props.canvasSize.globleScale;
   const animatedStyles = useAnimatedStyle((): any => {
     return {
-      // height: 100,
-      // width: 100,
-
       transform: [
         {translateX: !isNaN(offset.value.x) ? offset.value.x : 0},
         {translateY: !isNaN(offset.value.y) ? offset.value.y : 0},
@@ -100,14 +96,10 @@ export const AnimatedTextInput = (props: any) => {
             flexDirection: 'row',
             borderStyle: 'dotted',
             borderWidth: 2,
-            // backgroundColor: 'green',
-            // height: 'auto',
             alignItems: 'flex-start',
             justifyContent: 'flex-start',
-            // width: '100%'
           },
         ]}>
-        {/* <View style={{borderColor: 'black',  height: 'auto'}}> */}
         <TextInput
           style={[
             styles.textInput,
@@ -115,19 +107,16 @@ export const AnimatedTextInput = (props: any) => {
               fontSize: props.fontSize,
               color: props.color,
               fontFamily: props.fontFamily,
-              fontStyle: props.isItalic,
-              fontWeight: props.isBold,
+              fontStyle: props.isItalic ? 'italic' : 'normal',
+              fontWeight: props.isBold ? 'bold' : 'normal',
+              textDecorationLine: props.isUnderline ? 'underline' : 'none',
             },
           ]}
           value={props.text}
           onChangeText={props.setText}
-          multiline={false} // Allow for multiple lines of text
+          multiline={false}
         />
-        {/* </View> */}
       </Animated.View>
-
-      {/* <AnimatedTextInput style={animatedStyles}/> */}
-      {/* <Animated.Text style={animatedStyles}>TEst</Animated.Text> */}
     </GestureDetector>
   );
 };
@@ -151,19 +140,25 @@ export const TextInputToolBar = (props: any) => {
             height: 100,
             justifyContent: 'space-evenly',
           }}>
-          <Pressable style={{height: '40%', width: '10%'}}>
+          <Pressable
+            style={{height: '40%', width: '10%'}}
+            onPress={() => props.updateTextInputStyle('bold')}>
             <Image
               style={{height: '100%', width: '100%'}}
               source={require('../../../assets/icons/format_bold.png')}
             />
           </Pressable>
-          <Pressable style={{height: '40%', width: '10%'}}>
+          <Pressable
+            style={{height: '40%', width: '10%'}}
+            onPress={() => props.updateTextInputStyle('italic')}>
             <Image
               style={{height: '100%', width: '100%'}}
               source={require('../../../assets/icons/format_italic.png')}
             />
           </Pressable>
-          <Pressable style={{height: '40%', width: '10%'}}>
+          <Pressable
+            style={{height: '40%', width: '10%'}}
+            onPress={() => props.updateTextInputStyle('underline')}>
             <Image
               style={{height: '100%', width: '100%'}}
               source={require('../../../assets/icons/format_underline.png')}

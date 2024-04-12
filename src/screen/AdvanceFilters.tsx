@@ -17,7 +17,7 @@ export const AdvanceFilters = (props: any) => {
         style={{width: 50, height: 50, alignItems: 'center'}}>
         <Image
           style={{resizeMode: 'contain', width: '60%', height: '60%'}}
-          source={require('../DesignerDemo/assets/icons/sendFront.png')}
+          source={require('../../assets/icons/sendFront.png')}
         />
         <Text>Send Front</Text>
       </Pressable>
@@ -27,7 +27,7 @@ export const AdvanceFilters = (props: any) => {
         style={{width: 50, height: 50, alignItems: 'center'}}>
         <Image
           style={{resizeMode: 'contain', width: '60%', height: '60%'}}
-          source={require('../DesignerDemo/assets/icons/sendBack.png')}
+          source={require('../../assets/icons/sendBack.png')}
         />
         <Text>Send Back</Text>
       </Pressable>
@@ -37,7 +37,7 @@ export const AdvanceFilters = (props: any) => {
         style={{width: 50, height: 50, alignItems: 'center'}}>
         <Image
           style={{resizeMode: 'contain', width: '60%', height: '60%'}}
-          source={require('../DesignerDemo/assets/icons/flip.png')}
+          source={require('../../assets/icons/flip.png')}
         />
         <Text>FlipX</Text>
       </Pressable>
@@ -47,7 +47,7 @@ export const AdvanceFilters = (props: any) => {
         style={{width: 50, height: 50, alignItems: 'center'}}>
         <Image
           style={{resizeMode: 'contain', width: '60%', height: '60%'}}
-          source={require('../DesignerDemo/assets/icons/flip_vertical.jpg')}
+          source={require('../../assets/icons/flip_vertical.jpg')}
         />
         <Text>FlipY</Text>
       </Pressable>
@@ -57,15 +57,17 @@ export const AdvanceFilters = (props: any) => {
         style={{width: 60, height: 50, alignItems: 'center'}}>
         <Image
           style={{resizeMode: 'contain', width: '60%', height: '60%'}}
-          source={require('../DesignerDemo/assets/icons/duplicate.png')}
+          source={require('../../assets/icons/duplicate.png')}
         />
         <Text>Duplicate</Text>
       </Pressable>
 
-      <Pressable style={{width: 60, height: 50, alignItems: 'center'}}>
+      <Pressable
+        style={{width: 60, height: 50, alignItems: 'center'}}
+        onPress={props.deleteCurrentSelection}>
         <Image
           style={{resizeMode: 'contain', width: '60%', height: '60%'}}
-          source={require('../DesignerDemo/assets/icons/delete.png')}
+          source={require('../../assets/icons/delete.png')}
         />
         <Text>Delete</Text>
       </Pressable>

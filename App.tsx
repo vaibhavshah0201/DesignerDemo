@@ -1,12 +1,10 @@
-import {useEffect, useState, useRef} from 'react';
+import {useEffect, useState} from 'react';
 import {
   PixelRatio,
   Pressable,
   View,
   ImageBackground,
   StyleSheet,
-  Text,
-  Image,
 } from 'react-native';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {AnimatedImage} from './src/components/designer/AnimatedImage';
@@ -15,7 +13,6 @@ import {ShapeList} from './src/screen/ShapeList';
 import {ToolList} from './src/screen/ToolList';
 import {CircleShape} from './src/components/designer/Shapes/Circle';
 import {RectangleShape} from './src/components/designer/Shapes/Rectangle';
-import {EditorView} from './src/components/designer/Editor';
 import {
   AnimatedTextInput,
   TextInputToolBar,
@@ -25,10 +22,9 @@ const App = () => {
   const [showModal, setShowModal] = useState(false);
   const [showShapes, setShowShapes] = useState(false);
   const [showTextTools, setShowTextTools] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(1);
+  const [selectedObject, setSelectedObject] = useState(1);
   const [bgColor, setBgColor] = useState('white');
-  const textInput = useRef();
-  const [text, setText] = useState('Type here');
+  const [text, setText] = useState<any>([]);
 
   const [data, setData] = useState<any>([
     {
@@ -54,7 +50,7 @@ const App = () => {
       isFlipVertically: false,
       source: 'https://source.unsplash.com/random/1024x768', // Replace with your new image URL
     };
-    setSelectedImage(data.length + 1);
+    setSelectedObject(data.length + 1);
     setData([...oldUpdatedData, newDataItem]);
   };
 
@@ -68,7 +64,7 @@ const App = () => {
       isSelected: true,
       source: '', // Replace with your new image URL
     };
-    setSelectedImage(data.length + 1);
+    setSelectedObject(data.length + 1);
     setData([...oldUpdatedData, newDataItem]);
   };
 
@@ -82,7 +78,7 @@ const App = () => {
       isSelected: true,
       source: '', // Replace with your new image URL
     };
-    setSelectedImage(data.length + 1);
+    setSelectedObject(data.length + 1);
     setData([...oldUpdatedData, newDataItem]);
   };
 
@@ -104,6 +100,7 @@ const App = () => {
       id: data.length + 1,
       tool: 'text',
       isSelected: true,
+      indexPosition: data.length + 1,
       addOns: {
         bold: false,
         italic: false,
@@ -112,11 +109,44 @@ const App = () => {
         fontStyle: 'arial',
       },
     };
+    setText([...text, {[data.length + 1]: 'Type here'}]);
     setData([...data, newDataItem]);
   };
 
+  const updateTextInputStyle = (type: string) => {
+    if (data) {
+      const newUpdatedData: any = [];
+      data.forEach((row: any) => {
+        if (type == 'bold') {
+          const newDataItem = {
+            ...row,
+            addOns: {...row.addOns, bold: true},
+          };
+          newUpdatedData.push(newDataItem);
+        }
+
+        if (type == 'italic') {
+          const newDataItem = {
+            ...row,
+            addOns: {...row.addOns, italic: true},
+          };
+          newUpdatedData.push(newDataItem);
+        }
+
+        if (type == 'underline') {
+          const newDataItem = {
+            ...row,
+            addOns: {...row.addOns, underline: true},
+          };
+          newUpdatedData.push(newDataItem);
+        }
+      });
+      setData(newUpdatedData);
+    }
+  };
+
   const handleImagePress = (imageId: any) => {
-    setSelectedImage(imageId);
+    setSelectedObject(imageId);
     if (data) {
       const newUpdatedData: any = [];
       data.forEach((row: any) => {
@@ -176,7 +206,7 @@ const App = () => {
 
   const sendSelectedImageToFront = () => {
     if (data.length > 1) {
-      const currentImage = findElementById(selectedImage);
+      const currentImage = findElementById(selectedObject);
       const nextImage = findNextElementByIndexPosition(
         currentImage?.indexPosition,
       );
@@ -189,7 +219,7 @@ const App = () => {
 
   const sendSelectedImageToBack = () => {
     if (data.length > 1) {
-      const currentImage = findElementById(selectedImage);
+      const currentImage = findElementById(selectedObject);
       const previousImage = findPreviousElementByIndexPosition(
         currentImage?.indexPosition,
       );
@@ -203,7 +233,7 @@ const App = () => {
   const flipHorizontal = () => {
     setData((prevData: any) =>
       prevData.map((item: any) =>
-        item.id === selectedImage && item.tool == 'image'
+        item.id === selectedObject && item.tool == 'image'
           ? {...item, isFlipHorizontally: !item.isFlipHorizontally}
           : item,
       ),
@@ -213,7 +243,7 @@ const App = () => {
   const flipVertically = () => {
     setData((prevData: any) =>
       prevData.map((item: any) =>
-        item.id === selectedImage && item.tool == 'image'
+        item.id === selectedObject && item.tool == 'image'
           ? {...item, isFlipVertically: !item.isFlipVertically}
           : item,
       ),
@@ -221,15 +251,22 @@ const App = () => {
   };
 
   const duplicateCurrentSelection = () => {
-    const currentImage = findElementById(selectedImage);
+    const currentImage = findElementById(selectedObject);
     const oldUpdatedData = resetSelectionFlag();
     const newDataItem = {
       ...currentImage,
       id: data.length + 1,
       indexPosition: data.length + 1,
     };
-    setSelectedImage(data.length + 1);
+    setSelectedObject(data.length + 1);
     setData([...oldUpdatedData, newDataItem]);
+  };
+
+  const deleteCurrentSelection = () => {
+    setData((prevData: any) =>
+      prevData.filter((item: any) => item.id !== selectedObject),
+    );
+    setSelectedObject(0);
   };
 
   const onSelectColor = ({hex}: any) => {
@@ -260,68 +297,77 @@ const App = () => {
           resizeMode="contain"
           style={[styles.canvasStyle, {backgroundColor: bgColor}]}>
           <GestureHandlerRootView style={{width: '100%', height: '100%'}}>
-            {data.map((image: any, index: any) => {
-              if (image.tool == 'image')
+            {data.map((object: any, index: any) => {
+              if (object.tool == 'image')
                 return (
                   <Pressable
-                    onPress={() => handleImagePress(image.id)}
+                    onPress={() => handleImagePress(object.id)}
                     key={index}
-                    style={{zIndex: image.indexPosition}}>
+                    style={{zIndex: object.indexPosition}}>
                     <AnimatedImage
-                      imageId={image.id}
+                      imageId={object.id}
                       handleImagePress={handleImagePress}
-                      path={image.source}
-                      isSelected={image.id == selectedImage ? true : false}
-                      isFlipHorizontally={image.isFlipHorizontally}
-                      isFlipVertically={image.isFlipVertically}
+                      path={object.source}
+                      isSelected={object.id == selectedObject ? true : false}
+                      isFlipHorizontally={object.isFlipHorizontally}
+                      isFlipVertically={object.isFlipVertically}
                     />
                   </Pressable>
                 );
 
-              if (image.tool == 'shape') {
-                if (image.type == 'circle') {
+              if (object.tool == 'shape') {
+                if (object.type == 'circle') {
                   return (
                     <Pressable
-                      onPress={() => handleImagePress(image.id)}
+                      onPress={() => handleImagePress(object.id)}
                       key={index}
-                      style={{zIndex: image.indexPosition}}>
+                      style={{zIndex: object.indexPosition}}>
                       <CircleShape
-                        imageId={image.id}
+                        imageId={object.id}
                         handleImagePress={handleImagePress}
-                        path={image.source}
-                        isSelected={image.id == selectedImage ? true : false}
+                        path={object.source}
+                        isSelected={object.id == selectedObject ? true : false}
                       />
                     </Pressable>
                   );
                 }
 
-                if (image.type == 'rectangle') {
+                if (object.type == 'rectangle') {
                   return (
                     <Pressable
-                      onPress={() => handleImagePress(image.id)}
+                      onPress={() => handleImagePress(object.id)}
                       key={index}
-                      style={{zIndex: image.indexPosition}}>
+                      style={{zIndex: object.indexPosition}}>
                       <RectangleShape
-                        imageId={image.id}
+                        imageId={object.id}
                         handleImagePress={handleImagePress}
-                        path={image.source}
-                        isSelected={image.id == selectedImage ? true : false}
+                        path={object.source}
+                        isSelected={object.id == selectedObject ? true : false}
                       />
                     </Pressable>
                   );
                 }
+              }
 
-                if (image.type == 'text') {
-                  return (
+              if (object.tool == 'text') {
+                return (
+                  <Pressable key={index} style={{zIndex: object.indexPosition}}>
                     <AnimatedTextInput
-                      text={text}
-                      setText={setText}
-                      isBold={image.addOns.bold ? 'bolder' : '100'}
+                      text={text[object.id]}
+                      setText={(newText: string) => {
+                        // Define a function that updates the text for the specific id
+                        const newTextArray = [...text];
+                        newTextArray[object.id] = newText;
+                        setText(newTextArray);
+                      }}
+                      isBold={object.addOns.bold}
+                      isItalic={object.addOns.italic}
+                      isUnderline={object.addOns.underline}
                       fontFamily={'arial'}
                       color={'red'}
                     />
-                  );
-                }
+                  </Pressable>
+                );
               }
             })}
             {/* <EditorView /> */}
@@ -337,6 +383,7 @@ const App = () => {
         addImageToData={addImageToData}
         showTextTools={showTextTools}
         setShowTextTools={setShowTextTools}
+        addTextInputToData={addTextInputToData}
       />
       <AdvanceFilters
         showShapes={showShapes}
@@ -346,6 +393,7 @@ const App = () => {
         flipHorizontal={flipHorizontal}
         flipVertically={flipVertically}
         duplicateCurrentSelection={duplicateCurrentSelection}
+        deleteCurrentSelection={deleteCurrentSelection}
       />
       <View
         style={{
@@ -368,6 +416,8 @@ const App = () => {
       <TextInputToolBar
         setShowTextTools={setShowTextTools}
         showTextTools={showTextTools}
+        addTextInputToData={addTextInputToData}
+        updateTextInputStyle={updateTextInputStyle}
       />
     </View>
   );
@@ -381,6 +431,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: '100%',
     width: '100%',
+    position: 'absolute',
   },
   canvasStyle: {
     overflow: 'hidden',

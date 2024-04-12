@@ -1,6 +1,11 @@
 import {Image, Pressable, StyleSheet, View} from 'react-native';
 
 export const ToolList = (props: any) => {
+  const handleTextInput = () => {
+    props.setShowTextTools(true);
+    props.addTextInputToData();
+  };
+
   return (
     <View
       style={[
@@ -12,9 +17,7 @@ export const ToolList = (props: any) => {
               : 'none',
         },
       ]}>
-      <Pressable
-        style={styles.toolContainer}
-        onPress={() => props.setShowTextTools(true)}>
+      <Pressable style={styles.toolContainer} onPress={handleTextInput}>
         <Image
           style={styles.toolImage}
           source={require('../../assets/icons/add_text.png')}
