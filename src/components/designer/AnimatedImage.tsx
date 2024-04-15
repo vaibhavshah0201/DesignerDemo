@@ -1,36 +1,29 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
+  runOnJS
 } from 'react-native-reanimated';
 import {Image} from 'react-native';
 
-export const AnimatedImage = (props: any) => {
+export const AnimatedImage = (props: any) => {  
   const offset = useSharedValue({
-    x: 0,
-    y: 0,
+    x: props.config.translateX,
+    y: props.config.translateY,
   });
 
   const position = useSharedValue({
-    x: 0,
-    y: 0,
+    x: props.config.translateX,
+    y: props.config.translateY,
   });
-  const [center, setCenter] = useState({
-    x: 0,
-    y: 0,
-  });
+  
+  const scale = useSharedValue(props.config.scale);
+  const savedScale = useSharedValue(props.config.scale);
+  const rotation = useSharedValue(props.config.rotation);
+  const savedRotation = useSharedValue(props.config.rotation);
 
-  const scaleXPosition = useSharedValue(0);
-  const scaleYPosition = useSharedValue(0);
-  const scale = useSharedValue(1);
-  const savedScale = useSharedValue(1);
-  const rotation = useSharedValue(0);
-  const savedRotation = useSharedValue(0);
-  const borderWidth = useSharedValue(0);
-  // const globleScale = props.canvasSize && props.canvasSize.globleScale;
-
-  const animatedStyles = useAnimatedStyle((): any => {
+  const animatedStyles = useAnimatedStyle((): any => {    
     return {
       height: 100,
       width: 100,
@@ -49,6 +42,10 @@ export const AnimatedImage = (props: any) => {
     };
   });
 
+  const setConfigValue = (config: any,configKey:string) => {
+    props.setConfigValue(config,configKey);
+  };
+  
   const dragGesture = Gesture.Pan()
     .averageTouches(true)
     .onUpdate(e => {
@@ -62,7 +59,12 @@ export const AnimatedImage = (props: any) => {
         x: offset.value.x,
         y: offset.value.y,
       };
+      
+      props.config.translateX = offset.value.x;
+      props.config.translateY = offset.value.y;
+      runOnJS(setConfigValue)(props.config,'drag');
     });
+    
 
   const zoomGesture = Gesture.Pinch()
     .onUpdate(event => {
@@ -70,10 +72,8 @@ export const AnimatedImage = (props: any) => {
     })
     .onEnd(event => {
       savedScale.value = scale.value;
-      scaleXPosition.value =
-        event.focalX - (event.focalX - position.value.x) * (1 - event.scale);
-      scaleYPosition.value =
-        event.focalY - (event.focalY - position.value.y) * (1 - event.scale);
+      props.config.scale = scale.value;
+      runOnJS(setConfigValue)(props.config,'zoom');
     });
 
   const rotateGesture = Gesture.Rotation()
@@ -82,10 +82,15 @@ export const AnimatedImage = (props: any) => {
     })
     .onEnd(() => {
       savedRotation.value = rotation.value;
+      props.config.rotation = rotation.value;
+      runOnJS(setConfigValue)(props.config,'rotate');
     });
 
   const tapStart = Gesture.Tap().onStart(() => {
     props.handleImagePress;
+    // console.log('============props.config========================');
+    // console.log(offset.value);
+    // console.log('====================================');
   });
 
   const composed = Gesture.Simultaneous(
@@ -93,9 +98,15 @@ export const AnimatedImage = (props: any) => {
     dragGesture,
     tapStart,
   );
-
   const gestureComposed = (props.isSelected) ? composed : tapStart;
-
+  
+  // useEffect(()=>{
+  //   // props.setConfig(props.config);
+  //   console.log('============props.config========================');
+  //   console.log(props.config);
+  //   console.log('====================================');
+  // },[offsetX.value])
+  
   return (
     <GestureDetector gesture={gestureComposed}>
       <Animated.View

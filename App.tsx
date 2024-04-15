@@ -23,9 +23,11 @@ const App = () => {
   const [showShapes, setShowShapes] = useState(false);
   const [showTextTools, setShowTextTools] = useState(false);
   const [selectedObject, setSelectedObject] = useState(1);
+  const [selectedHistoryObject, setSelectedHistoryObject] = useState(selectedObject);
   const [bgColor, setBgColor] = useState('white');
   const [text, setText] = useState<any>([]);
 
+  const [historyData, setHistoryData] = useState<any>([]);
   const [data, setData] = useState<any>([
     {
       id: 1,
@@ -36,6 +38,14 @@ const App = () => {
       isFlipVertically: false,
       source:
         'https://images.pexels.com/photos/734353/pexels-photo-734353.jpeg',
+      config:{
+        translateX:0,
+        translateY:0,
+        scale:1,
+        scaleX:1,
+        scaleY:1,
+        rotation:0,
+      }
     },
   ]);
 
@@ -49,6 +59,14 @@ const App = () => {
       isFlipHorizontally: false,
       isFlipVertically: false,
       source: 'https://source.unsplash.com/random/1024x768', // Replace with your new image URL
+      config:{
+        translateX:0,
+        translateY:0,
+        scale:1,
+        scaleX:1,
+        scaleY:1,
+        rotation:0,
+      }
     };
     setSelectedObject(data.length + 1);
     setData([...oldUpdatedData, newDataItem]);
@@ -63,6 +81,14 @@ const App = () => {
       type: 'circle',
       isSelected: true,
       source: '', // Replace with your new image URL
+      config:{
+        translateX:0,
+        translateY:0,
+        scale:1,
+        scaleX:1,
+        scaleY:1,
+        rotation:0,
+      }
     };
     setSelectedObject(data.length + 1);
     setData([...oldUpdatedData, newDataItem]);
@@ -77,6 +103,14 @@ const App = () => {
       type: 'rectangle',
       isSelected: true,
       source: '', // Replace with your new image URL
+      config:{
+        translateX:0,
+        translateY:0,
+        scale:1,
+        scaleX:1,
+        scaleY:1,
+        rotation:0,
+      }
     };
     setSelectedObject(data.length + 1);
     setData([...oldUpdatedData, newDataItem]);
@@ -257,6 +291,11 @@ const App = () => {
       ...currentImage,
       id: data.length + 1,
       indexPosition: data.length + 1,
+      config:{
+        ...currentImage.config,
+        translateX:(currentImage.config.translateX > 0) ? currentImage.config.translateX - 10 : currentImage.config.translateX + 10,
+        translateY:(currentImage.config.translateY > 0) ? currentImage.config.translateY - 10 : currentImage.config.translateY + 10,
+      }
     };
     setSelectedObject(data.length + 1);
     setData([...oldUpdatedData, newDataItem]);
@@ -267,15 +306,39 @@ const App = () => {
       prevData.filter((item: any) => item.id !== selectedObject),
     );
     setSelectedObject(0);
+    
   };
 
   const onSelectColor = ({hex}: any) => {
     setBgColor(hex);
   };
 
+  const setConfigValue = (config: any,configKey:string) => {
+    if(configKey=='drag'){
+      setData((prevData: any) =>
+        prevData.map((item: any) =>
+          item.id === selectedObject ? {...item,config:{...item.config,translateX: config.translateX,translateY: config.translateY}} : item,
+        ),
+      );
+    }else if(configKey=='zoom'){
+      setData((prevData: any) =>
+        prevData.map((item: any) =>
+          item.id === selectedObject ? {...item,config:{...item.config,scale: config.scale}} : item,
+        ),
+      );
+    }else if(configKey=='rotate'){
+      setData((prevData: any) =>
+        prevData.map((item: any) =>
+          item.id === selectedObject ? {...item,config:{...item.config,rotation: config.rotation}} : item,
+        ),
+      );
+    }
+  };
+
   useEffect(() => {
-    // console.log('================data====================');
-    // console.log(data);
+    // const currentImage = findElementById(selectedObject);
+    // console.log('==============currentImage====================');
+    // console.log(currentImage);
     // console.log('====================================');
   }, [data]);
 
@@ -302,7 +365,7 @@ const App = () => {
                 return (
                   <Pressable
                     onPress={() => handleImagePress(object.id)}
-                    key={index}
+                    key={object.id}
                     style={{zIndex: object.indexPosition}}>
                     <AnimatedImage
                       imageId={object.id}
@@ -311,6 +374,8 @@ const App = () => {
                       isSelected={object.id == selectedObject ? true : false}
                       isFlipHorizontally={object.isFlipHorizontally}
                       isFlipVertically={object.isFlipVertically}
+                      config={object.config}
+                      setConfigValue={setConfigValue}
                     />
                   </Pressable>
                 );
@@ -320,7 +385,7 @@ const App = () => {
                   return (
                     <Pressable
                       onPress={() => handleImagePress(object.id)}
-                      key={index}
+                      key={object.id}
                       style={{zIndex: object.indexPosition}}>
                       <CircleShape
                         imageId={object.id}
@@ -336,7 +401,7 @@ const App = () => {
                   return (
                     <Pressable
                       onPress={() => handleImagePress(object.id)}
-                      key={index}
+                      key={object.id}
                       style={{zIndex: object.indexPosition}}>
                       <RectangleShape
                         imageId={object.id}
@@ -351,7 +416,7 @@ const App = () => {
 
               if (object.tool == 'text') {
                 return (
-                  <Pressable key={index} style={{zIndex: object.indexPosition}}>
+                  <Pressable key={object.id} style={{zIndex: object.indexPosition}}>
                     <AnimatedTextInput
                       text={text[object.id]}
                       setText={(newText: string) => {
