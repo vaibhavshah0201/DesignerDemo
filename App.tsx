@@ -180,7 +180,7 @@ const App = () => {
   };
 
   const handleImagePress = (imageId: any) => {
-    setSelectedObject(imageId);
+        setSelectedObject(imageId);
     if (data) {
       const newUpdatedData: any = [];
       data.forEach((row: any) => {
@@ -415,21 +415,26 @@ const App = () => {
               }
 
               if (object.tool == 'text') {
+                const indexToDisplay = text.findIndex((item:any) => item[object.id]);
                 return (
-                  <Pressable key={object.id} style={{zIndex: object.indexPosition}}>
+                  <Pressable onPress={() => handleImagePress(object.id)} key={object.id} style={{zIndex: object.indexPosition, backgroundColor: 'red'}}>
                     <AnimatedTextInput
-                      text={text[object.id]}
+                      handleImagePress={handleImagePress}
+                      text={text[indexToDisplay][object.id]}
                       setText={(newText: string) => {
-                        // Define a function that updates the text for the specific id
-                        const newTextArray = [...text];
-                        newTextArray[object.id] = newText;
-                        setText(newTextArray);
+                        const indexToUpdate = text.findIndex((item:any) => item[object.id]);
+                        if (indexToUpdate !== -1) {
+                          const updatedText = [...text];
+                          updatedText[indexToUpdate][object.id] = newText;
+                          setText(updatedText);
+                        }
                       }}
                       isBold={object.addOns.bold}
                       isItalic={object.addOns.italic}
                       isUnderline={object.addOns.underline}
                       fontFamily={'arial'}
                       color={'red'}
+                      imageId={object.id}
                     />
                   </Pressable>
                 );

@@ -83,9 +83,16 @@ export const AnimatedTextInput = (props: any) => {
       savedRotation.value = rotation.value;
     });
 
+    const tapStart = Gesture.Tap().onStart(() => {
+      console.log('tap called');
+      
+      props.handleImagePress;
+    });
+
   const composed = Gesture.Simultaneous(
     dragGesture,
-    Gesture.Simultaneous(zoomGesture, rotateGesture),
+    tapStart,
+    Gesture.Simultaneous(zoomGesture, rotateGesture)
   );
   return (
     <GestureDetector gesture={composed}>
@@ -94,10 +101,11 @@ export const AnimatedTextInput = (props: any) => {
           animatedStyles,
           {
             flexDirection: 'row',
-            borderStyle: 'dotted',
+            borderStyle: 'dashed',
             borderWidth: 2,
             alignItems: 'flex-start',
             justifyContent: 'flex-start',
+            backgroundColor: 'green'
           },
         ]}>
         <TextInput
