@@ -8,6 +8,7 @@ import Animated, {
 import {Image} from 'react-native';
 
 export const AnimatedImage = (props: any) => {  
+
   const offset = useSharedValue({
     x: props.config.translateX,
     y: props.config.translateY,
@@ -22,6 +23,19 @@ export const AnimatedImage = (props: any) => {
   const savedScale = useSharedValue(props.config.scale);
   const rotation = useSharedValue(props.config.rotation);
   const savedRotation = useSharedValue(props.config.rotation);
+
+  useEffect(() => {
+    offset.value = {
+      x: props.config.translateX,
+      y: props.config.translateY,
+    };
+    position.value = {
+      x: props.config.translateX,
+      y: props.config.translateY,
+    };
+    scale.value = props.config.scale;
+    rotation.value = props.config.rotation;
+  },[props.selectedHistoryObject]);
 
   const animatedStyles = useAnimatedStyle((): any => {    
     return {

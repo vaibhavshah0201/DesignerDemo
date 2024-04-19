@@ -23,11 +23,17 @@ const App = () => {
   const [showShapes, setShowShapes] = useState(false);
   const [showTextTools, setShowTextTools] = useState(false);
   const [selectedObject, setSelectedObject] = useState(1);
-  const [selectedHistoryObject, setSelectedHistoryObject] = useState(selectedObject);
+  const [historyNumberObject, setHistoryNumberObject] = useState(0);
+  const [selectedHistoryObject, setSelectedHistoryObject] =
+    useState(
+      {[selectedObject]:0}
+    );
+  
   const [bgColor, setBgColor] = useState('white');
   const [text, setText] = useState<any>([]);
 
   const [historyData, setHistoryData] = useState<any>([]);
+  
   const [data, setData] = useState<any>([
     {
       id: 1,
@@ -38,14 +44,14 @@ const App = () => {
       isFlipVertically: false,
       source:
         'https://images.pexels.com/photos/734353/pexels-photo-734353.jpeg',
-      config:{
-        translateX:0,
-        translateY:0,
-        scale:1,
-        scaleX:1,
-        scaleY:1,
-        rotation:0,
-      }
+      config: {
+        translateX: 0,
+        translateY: 0,
+        scale: 1,
+        scaleX: 1,
+        scaleY: 1,
+        rotation: 0,
+      },
     },
   ]);
 
@@ -59,17 +65,18 @@ const App = () => {
       isFlipHorizontally: false,
       isFlipVertically: false,
       source: 'https://source.unsplash.com/random/1024x768', // Replace with your new image URL
-      config:{
-        translateX:0,
-        translateY:0,
-        scale:1,
-        scaleX:1,
-        scaleY:1,
-        rotation:0,
-      }
+      config: {
+        translateX: 0,
+        translateY: 0,
+        scale: 1,
+        scaleX: 1,
+        scaleY: 1,
+        rotation: 0,
+      },
     };
     setSelectedObject(data.length + 1);
     setData([...oldUpdatedData, newDataItem]);
+    setHistoryNumberObject(historyNumberObject+1);
   };
 
   const addCricleShapeToData = () => {
@@ -81,14 +88,14 @@ const App = () => {
       type: 'circle',
       isSelected: true,
       source: '', // Replace with your new image URL
-      config:{
-        translateX:0,
-        translateY:0,
-        scale:1,
-        scaleX:1,
-        scaleY:1,
-        rotation:0,
-      }
+      config: {
+        translateX: 0,
+        translateY: 0,
+        scale: 1,
+        scaleX: 1,
+        scaleY: 1,
+        rotation: 0,
+      },
     };
     setSelectedObject(data.length + 1);
     setData([...oldUpdatedData, newDataItem]);
@@ -103,14 +110,14 @@ const App = () => {
       type: 'rectangle',
       isSelected: true,
       source: '', // Replace with your new image URL
-      config:{
-        translateX:0,
-        translateY:0,
-        scale:1,
-        scaleX:1,
-        scaleY:1,
-        rotation:0,
-      }
+      config: {
+        translateX: 0,
+        translateY: 0,
+        scale: 1,
+        scaleX: 1,
+        scaleY: 1,
+        rotation: 0,
+      },
     };
     setSelectedObject(data.length + 1);
     setData([...oldUpdatedData, newDataItem]);
@@ -231,6 +238,8 @@ const App = () => {
     const currentIndex = sortedData.findIndex(
       item => item.indexPosition === position,
     );
+    console.log(sortedData);
+    
     if (currentIndex > 0 && currentIndex < sortedData.length) {
       return sortedData[currentIndex - 1]; // Return the previous element
     } else {
@@ -248,6 +257,7 @@ const App = () => {
         updateIndexPosition(currentImage?.id, nextImage.indexPosition);
         updateIndexPosition(nextImage?.id, currentImage?.indexPosition);
       }
+      
     }
   };
 
@@ -257,10 +267,13 @@ const App = () => {
       const previousImage = findPreviousElementByIndexPosition(
         currentImage?.indexPosition,
       );
+      console.log(currentImage);
+      console.log(previousImage);
+      
       if (previousImage != null) {
         updateIndexPosition(currentImage?.id, previousImage.indexPosition);
         updateIndexPosition(previousImage?.id, currentImage?.indexPosition);
-      }
+      }      
     }
   };
 
@@ -272,6 +285,7 @@ const App = () => {
           : item,
       ),
     );
+    setHistoryNumberObject(historyNumberObject+1);
   };
 
   const flipVertically = () => {
@@ -282,6 +296,7 @@ const App = () => {
           : item,
       ),
     );
+    setHistoryNumberObject(historyNumberObject+1);
   };
 
   const duplicateCurrentSelection = () => {
@@ -291,14 +306,21 @@ const App = () => {
       ...currentImage,
       id: data.length + 1,
       indexPosition: data.length + 1,
-      config:{
+      config: {
         ...currentImage.config,
-        translateX:(currentImage.config.translateX > 0) ? currentImage.config.translateX - 10 : currentImage.config.translateX + 10,
-        translateY:(currentImage.config.translateY > 0) ? currentImage.config.translateY - 10 : currentImage.config.translateY + 10,
-      }
+        translateX:
+          currentImage.config.translateX > 0
+            ? currentImage.config.translateX - 10
+            : currentImage.config.translateX + 10,
+        translateY:
+          currentImage.config.translateY > 0
+            ? currentImage.config.translateY - 10
+            : currentImage.config.translateY + 10,
+      },
     };
     setSelectedObject(data.length + 1);
     setData([...oldUpdatedData, newDataItem]);
+    setHistoryNumberObject(historyNumberObject+1);
   };
 
   const deleteCurrentSelection = () => {
@@ -306,41 +328,230 @@ const App = () => {
       prevData.filter((item: any) => item.id !== selectedObject),
     );
     setSelectedObject(0);
-    
   };
 
   const onSelectColor = ({hex}: any) => {
     setBgColor(hex);
   };
 
-  const setConfigValue = (config: any,configKey:string) => {
-    if(configKey=='drag'){
+  const setConfigValue = (config: any, configKey: string) => {
+    if (configKey == 'drag') {
       setData((prevData: any) =>
         prevData.map((item: any) =>
-          item.id === selectedObject ? {...item,config:{...item.config,translateX: config.translateX,translateY: config.translateY}} : item,
+          item.id === selectedObject
+            ? {
+                ...item,
+                config: {
+                  ...item.config,
+                  translateX: config.translateX,
+                  translateY: config.translateY,
+                },
+              }
+            : item,
         ),
       );
-    }else if(configKey=='zoom'){
+    } else if (configKey == 'zoom') {
       setData((prevData: any) =>
         prevData.map((item: any) =>
-          item.id === selectedObject ? {...item,config:{...item.config,scale: config.scale}} : item,
+          item.id === selectedObject
+            ? {...item, config: {...item.config, scale: config.scale}}
+            : item,
         ),
       );
-    }else if(configKey=='rotate'){
+    } else if (configKey == 'rotate') {
       setData((prevData: any) =>
         prevData.map((item: any) =>
-          item.id === selectedObject ? {...item,config:{...item.config,rotation: config.rotation}} : item,
+          item.id === selectedObject
+            ? {...item, config: {...item.config, rotation: config.rotation}}
+            : item,
+        ),
+      );
+    } else if (configKey == 'history') {      
+      setData((prevData: any) =>
+        prevData.map((item: any) =>
+          item.id === selectedObject
+            ? 
+            {
+              ...config,
+              id:item.id,
+              indexPosition:item.indexPosition
+            }
+            : item,
         ),
       );
     }
+
+    if(configKey != 'history'){
+      setHistoryNumberObject(historyNumberObject+1);
+    }
+  };
+
+  const findLatestHistoryItem = (imageId: number) => {
+    // Filter historyData array to get items with the specified imageId
+    const filteredItems = historyData.filter(
+      (item: any) => item.imageId === imageId,
+    );
+
+    // If no matching items found, return null
+    if (filteredItems.length === 0) {
+      return null;
+    }
+
+    // Use reduce to find the item with the highest id (which is the latest)
+    const latestItem = filteredItems.reduce((prev: any, current: any) => {
+      return prev.id > current.id ? prev : current;
+    });
+
+    return latestItem;
+  };
+
+  const findPreviousHistoryItem = () => {
+    // Filter historyData array to get items with the specified imageId
+    const filteredItems = historyData.filter(
+      (item: any) => item.imageId === selectedObject,
+    );
+
+    const currentSelectedHistoryObject = selectedHistoryObject[selectedObject];
+    if(currentSelectedHistoryObject == undefined){
+      return null;
+    }
+
+    const currentIndex = filteredItems.findIndex(
+      (item:any) => item.id === currentSelectedHistoryObject,
+    );    
+    
+    if (currentIndex > 0 && currentIndex < filteredItems.length) {
+      return filteredItems[currentIndex - 1]; // Return the previous element
+    } else {
+      return null; // Return null if there is no previous element
+    }
+  };
+
+  const findNextHistoryItem = () => {
+      // Filter historyData array to get items with the specified imageId
+      const filteredItems = historyData.filter(
+          (item: any) => item.imageId === selectedObject,
+      );
+
+      const currentSelectedHistoryObject = selectedHistoryObject[selectedObject];
+      if (currentSelectedHistoryObject === undefined) {
+          return null;
+      }
+
+      const currentIndex = filteredItems.findIndex(
+          (item: any) => item.id === currentSelectedHistoryObject,
+      );
+
+      if (currentIndex >= 0 && currentIndex < filteredItems.length - 1) {
+          return filteredItems[currentIndex + 1]; // Return the next element
+      } else {
+          return null; // Return null if there is no next element
+      }
+  };
+
+  const undoCurrentSelection = () => {
+    const previousHistoryItem = findPreviousHistoryItem();
+    const currentObj = findElementById(selectedObject);
+    const historyItem = findLatestHistoryItem(currentObj.id);
+    
+    if(previousHistoryItem != null){
+      updateHistoryState(currentObj.id,previousHistoryItem.id);
+      const history = previousHistoryItem.history;
+      setConfigValue(history,'history');
+    }
+  }
+
+  const redoCurrentSelection = () => {
+    const nextHistoryItem = findNextHistoryItem();
+    const currentObj = findElementById(selectedObject);
+    
+    if(nextHistoryItem != null){
+      updateHistoryState(currentObj.id,nextHistoryItem.id);
+      const history = nextHistoryItem.history;
+      setConfigValue(history,'history');
+    }
+  }
+
+  const pushObjectToHistory = (obj: any) => {
+    const newDataItem = {
+      id: historyData.length + 1,
+      imageId: obj.id,
+      history: {
+        ...obj,
+      },
+    };
+    setHistoryData([...historyData, newDataItem]);
+    return newDataItem;
+  };
+
+  const compareHistoryJSON = (obj1:any, obj2:any) => {
+      // Check if both inputs are objects
+      if (typeof obj1 !== 'object' || typeof obj2 !== 'object') {
+          return false;
+      }
+
+      // Get the keys of both objects
+      const keys1 = Object.keys(obj1);
+
+      // Iterate through keys of the first object
+      for (let key of keys1) {
+          // If the second object doesn't have the key or their values are different
+          if (!obj2.hasOwnProperty(key) || obj1[key] !== obj2[key]) {
+              return true; // Objects are different
+          }
+
+          // If both values are objects, recursively compare them
+          if (typeof obj1[key] === 'object' && typeof obj2[key] === 'object') {
+              if (compareHistoryJSON(obj1[key], obj2[key])) {
+                  return true; // Objects are different
+              }
+          }
+      }
+
+      // If no differences found, objects are the same
+      return false;
+  };
+
+  const setHistoryItem = () => {
+    const currentObj = findElementById(selectedObject);
+    const historyItem = findLatestHistoryItem(currentObj.id);
+    let latestHistoryItem = null;
+    if (historyItem == null) {
+      latestHistoryItem = pushObjectToHistory(currentObj);
+    }else{
+      const historyConfig = historyItem.history;
+      const isAnyChange = compareHistoryJSON(currentObj,historyConfig);
+      if(isAnyChange){
+        latestHistoryItem = pushObjectToHistory(currentObj);
+      }
+    }   
+    if(latestHistoryItem != null){
+      updateHistoryState(currentObj.id,latestHistoryItem.id);
+    }
+  }
+
+  const updateHistoryState = (key:any, value:any) => {
+    setSelectedHistoryObject((prevState:any) => {
+      // If key exists, update its value
+      if (prevState.hasOwnProperty(key)) {
+        return { ...prevState, [key]: value };
+      } else {
+        // If key doesn't exist, add new key value pair
+        return { ...prevState, [key]: value };
+      }
+    });
   };
 
   useEffect(() => {
-    // const currentImage = findElementById(selectedObject);
-    // console.log('==============currentImage====================');
-    // console.log(currentImage);
-    // console.log('====================================');
-  }, [data]);
+    setHistoryItem();    
+  },[historyNumberObject]);
+
+  useEffect(() => {
+    console.log('================History====================');
+    console.log(selectedHistoryObject);
+    console.log(historyData);
+    console.log('====================================');
+  },[historyData])
 
   return (
     <View style={styles.container}>
@@ -376,6 +587,7 @@ const App = () => {
                       isFlipVertically={object.isFlipVertically}
                       config={object.config}
                       setConfigValue={setConfigValue}
+                      selectedHistoryObject={selectedHistoryObject}
                     />
                   </Pressable>
                 );
@@ -464,6 +676,8 @@ const App = () => {
         flipVertically={flipVertically}
         duplicateCurrentSelection={duplicateCurrentSelection}
         deleteCurrentSelection={deleteCurrentSelection}
+        undoCurrentSelection={undoCurrentSelection}
+        redoCurrentSelection={redoCurrentSelection}
       />
       <View
         style={{

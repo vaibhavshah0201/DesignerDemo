@@ -14,27 +14,29 @@ export const AdvanceFilters = (props: any) => {
       }}>
       <Pressable
         onPress={props.sendSelectedImageToFront}
-        style={{width: 50, height: 50, alignItems: 'center'}}>
+        style={{width: 35, height: 30, alignItems: 'center'}}>
         <Image
           style={{resizeMode: 'contain', width: '60%', height: '60%'}}
           source={require('../../assets/icons/sendFront.png')}
         />
-        <Text>Send Front</Text>
+        <Text>Send</Text>
+        <Text>Front</Text>
       </Pressable>
 
       <Pressable
         onPress={props.sendSelectedImageToBack}
-        style={{width: 50, height: 50, alignItems: 'center'}}>
+        style={{width: 35, height: 30, alignItems: 'center'}}>
         <Image
           style={{resizeMode: 'contain', width: '60%', height: '60%'}}
           source={require('../../assets/icons/sendBack.png')}
         />
-        <Text>Send Back</Text>
+        <Text>Send</Text>
+        <Text>Back</Text>
       </Pressable>
 
       <Pressable
         onPress={() => props.flipHorizontal()}
-        style={{width: 50, height: 50, alignItems: 'center'}}>
+        style={{width: 30, height: 30, alignItems: 'center'}}>
         <Image
           style={{resizeMode: 'contain', width: '60%', height: '60%'}}
           source={require('../../assets/icons/flip.png')}
@@ -44,7 +46,7 @@ export const AdvanceFilters = (props: any) => {
 
       <Pressable
         onPress={() => props.flipVertically()}
-        style={{width: 50, height: 50, alignItems: 'center'}}>
+        style={{width: 30, height: 30, alignItems: 'center'}}>
         <Image
           style={{resizeMode: 'contain', width: '60%', height: '60%'}}
           source={require('../../assets/icons/flip_vertical.jpg')}
@@ -54,7 +56,7 @@ export const AdvanceFilters = (props: any) => {
 
       <Pressable
         onPress={() => props.duplicateCurrentSelection()}
-        style={{width: 60, height: 50, alignItems: 'center'}}>
+        style={{width: 60, height: 30, alignItems: 'center'}}>
         <Image
           style={{resizeMode: 'contain', width: '60%', height: '60%'}}
           source={require('../../assets/icons/duplicate.png')}
@@ -63,7 +65,27 @@ export const AdvanceFilters = (props: any) => {
       </Pressable>
 
       <Pressable
-        style={{width: 60, height: 50, alignItems: 'center'}}
+        onPress={() => props.undoCurrentSelection()}
+        style={{width: 35, height: 30, alignItems: 'center'}}>
+        <Image
+          style={{resizeMode: 'contain', width: '60%', height: '60%'}}
+          source={require('../../assets/icons/undo.png')}
+        />
+        <Text>Undo</Text>
+      </Pressable>
+
+      <Pressable
+        onPress={() => props.redoCurrentSelection()}
+        style={{width: 35, height: 30, alignItems: 'center'}}>
+        <Image
+          style={{resizeMode: 'contain', width: '60%', height: '60%'}}
+          source={require('../../assets/icons/redo.png')}
+        />
+        <Text>Redo</Text>
+      </Pressable>
+
+      <Pressable
+        style={{width: 45, height: 30, alignItems: 'center'}}
         onPress={props.deleteCurrentSelection}>
         <Image
           style={{resizeMode: 'contain', width: '60%', height: '60%'}}

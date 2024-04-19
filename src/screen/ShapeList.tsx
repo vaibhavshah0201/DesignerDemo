@@ -35,7 +35,7 @@ export const ShapeList = (props: any) => {
           onPress={props.addRectangleShapeToData}>
           <Image
             style={{resizeMode: 'contain', width: '75%', height: '75%'}}
-            source={require('/Users/vaibhav/Desktop/Development/Designer/DesignerDemo/assets/icons/ic_rectangle.png')}
+            source={require('../../assets/icons/ic_rectangle.png')}
           />
         </Pressable>
         <Pressable
@@ -43,7 +43,7 @@ export const ShapeList = (props: any) => {
           onPress={props.addCricleShapeToData}>
           <Image
             style={{resizeMode: 'contain', width: '75%', height: '75%'}}
-            source={require('/Users/vaibhav/Desktop/Development/Designer/DesignerDemo/assets/icons/ic_circle.png')}
+            source={require('../../assets/icons/ic_circle.png')}
           />
         </Pressable>
       </View>
