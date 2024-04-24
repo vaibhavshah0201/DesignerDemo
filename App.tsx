@@ -18,6 +18,9 @@ import {
   TextInputToolBar,
 } from './src/components/designer/TextInput';
 import {AdvanceFilters} from './src/screen/AdvanceFilters';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
+
 const App = () => {
   const [showModal, setShowModal] = useState(false);
   const [showShapes, setShowShapes] = useState(false);
@@ -43,7 +46,7 @@ const App = () => {
       isFlipHorizontally: false,
       isFlipVertically: false,
       source:
-        'https://images.pexels.com/photos/734353/pexels-photo-734353.jpeg',
+        'file:///Users/ravi/Library/Developer/CoreSimulator/Devices/DCF0AE61-7B80-462B-942F-94AE1D54757F/data/Containers/Data/Application/2BEF479F-8D8C-4F78-BA0D-3BA2B9A41720/tmp/2E80BEBA-5FF6-41C9-AFD1-0605AC96D8CC.png',
       config: {
         translateX: 0,
         translateY: 0,
@@ -55,7 +58,7 @@ const App = () => {
     },
   ]);
 
-  const addImageToData = () => {
+  const addImageToData = (imageUrl:any) => {
     const oldUpdatedData = resetSelectionFlag();
     const newDataItem = {
       id: data.length + 1,
@@ -64,7 +67,7 @@ const App = () => {
       isSelected: true,
       isFlipHorizontally: false,
       isFlipVertically: false,
-      source: 'https://source.unsplash.com/random/1024x768', // Replace with your new image URL
+      source: imageUrl, // Replace with your new image URL
       config: {
         translateX: 0,
         translateY: 0,
@@ -542,6 +545,42 @@ const App = () => {
     });
   };
 
+  const openImagePicker = async () => {
+    const result = await check(PERMISSIONS.IOS.PHOTO_LIBRARY);
+    if (result === RESULTS.GRANTED) {
+      // Permission is granted, open the image library
+      await launchImageLibrary({mediaType:'photo'}, (response:any) => {
+        if (response.didCancel) {
+          console.log('User cancelled image picker');
+        } else if (response.error) {
+          console.log('Image picker error: ', response.error);
+        } else {
+          let imageUri = response.uri || response.assets?.[0]?.uri;
+          addImageToData(imageUri);
+        }
+      });
+    } else {
+      const requestResult = await request(PERMISSIONS.IOS.PHOTO_LIBRARY);
+      if (requestResult === RESULTS.GRANTED) {
+        await launchImageLibrary({mediaType:'photo'}, (response:any) => {
+          if (response.didCancel) {
+            console.log('User cancelled image picker');
+          } else if (response.error) {
+            console.log('Image picker error: ', response.error);
+          } else {
+            let imageUri = response.uri || response.assets?.[0]?.uri;
+            addImageToData(imageUri);
+          }
+        });
+      } else if(requestResult === RESULTS.LIMITED){
+
+      } else {
+        console.log('Permission Denied');
+        // Alert.alert('Permission Denied', 'You need to grant access to your photo library to continue.');
+      }
+    }
+  };
+
   useEffect(() => {
     setHistoryItem();    
   },[historyNumberObject]);
@@ -662,7 +701,7 @@ const App = () => {
         showModal={showModal}
         showShapes={showShapes}
         setShowShapes={setShowShapes}
-        addImageToData={addImageToData}
+        addImageToData={openImagePicker}
         showTextTools={showTextTools}
         setShowTextTools={setShowTextTools}
         addTextInputToData={addTextInputToData}
